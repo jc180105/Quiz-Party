@@ -57,9 +57,9 @@ function setupRoutes(app, upload, io, PORT) {
     // QR Code
     app.get('/api/qrcode', async (req, res) => {
         try {
-            // Use request headers to auto-detect URL (works on Railway + local)
+            // Railway uses reverse proxy: x-forwarded-host has the public domain
             const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-            const host = req.get('host');
+            const host = req.headers['x-forwarded-host'] || req.get('host');
             const url = `${protocol}://${host}/player?pin=${state.game.pin}`;
             const qr = await QRCode.toDataURL(url, { width: 300, margin: 2 });
             res.json({ qr, pin: state.game.pin, url });

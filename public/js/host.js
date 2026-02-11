@@ -87,22 +87,26 @@ const btnReset = document.getElementById('btn-reset');
 
 let currentMaxTime = 20;
 
+// --- Helper ---
+function loadQRCode() {
+    fetch(API_URL + '/api/qrcode')
+        .then(r => r.json())
+        .then(data => {
+            qrCode.src = data.qr;
+            pinDisplay.textContent = data.pin;
+            const displayUrl = data.url.replace(/^https?:\/\//, '');
+            joinUrl.textContent = displayUrl;
+        });
+}
+
 // --- Init ---
 socket.emit('host-join');
-
-// Load QR Code
-fetch(API_URL + '/api/qrcode')
-    .then(r => r.json())
-    .then(data => {
-        qrCode.src = data.qr;
-        pinDisplay.textContent = data.pin;
-        const displayUrl = data.url.replace(/^https?:\/\//, '');
-        joinUrl.textContent = displayUrl;
-    });
 
 // --- Socket Events ---
 socket.on('game-pin', (data) => {
     pinDisplay.textContent = data.pin;
+    // Load QR after PIN is set (avoids race condition)
+    loadQRCode();
 });
 
 socket.on('player-list', (players) => {
@@ -274,14 +278,7 @@ socket.on('show-podium', (data) => {
 
 socket.on('game-reset', () => {
     showScreen('waiting');
-    fetch(API_URL + '/api/qrcode')
-        .then(r => r.json())
-        .then(data => {
-            qrCode.src = data.qr;
-            pinDisplay.textContent = data.pin;
-            const displayUrl = data.url.replace(/^https?:\/\//, '');
-            joinUrl.textContent = displayUrl;
-        });
+    loadQRCode();
 });
 
 // --- Button Handlers ---
