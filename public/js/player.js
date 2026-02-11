@@ -58,19 +58,29 @@ if (avatarPreview && avatarInput) {
         const formData = new FormData();
         formData.append('image', file);
 
+        // Disable Join Button
+        btnJoin.disabled = true;
+        btnJoin.textContent = 'Enviando foto...';
+
         try {
             const res = await fetch(API_URL + '/api/upload', { method: 'POST', body: formData });
             if (res.ok) {
                 const data = await res.json();
                 avatarUrl = data.url;
                 console.log('Avatar upload success:', avatarUrl);
+                btnJoin.textContent = 'Entrar! 🎉';
+                btnJoin.disabled = false;
             } else {
                 console.error('Upload failed:', await res.text());
                 alert('Erro ao enviar foto. Tente uma imagem menor.');
+                btnJoin.textContent = 'Entrar! 🎉';
+                btnJoin.disabled = false;
             }
         } catch (err) {
             console.error('Upload error', err);
             alert('Erro de conexão ao enviar foto.');
+            btnJoin.textContent = 'Entrar! 🎉';
+            btnJoin.disabled = false;
         }
     });
 }
