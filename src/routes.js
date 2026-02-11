@@ -1,8 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 const QRCode = require('qrcode');
-const { state, loadQuestions, questionsPath, settingsPath, loadSettings } = require('./gameState');
+const { state, loadQuestions, loadSettings } = require('./gameState');
 const { log, getLocalIp } = require('./utils');
+const { query, pool } = require('./db');
 
 function setupRoutes(app, upload, io, PORT) {
     const LOCAL_IP = getLocalIp();
@@ -10,41 +11,48 @@ function setupRoutes(app, upload, io, PORT) {
     // --- API Routes ---
 
     // Get Questions
-    app.get('/api/questions', (req, res) => {
+    app.get('/api/questions', async (req, res) => {
+        // Optional: reload from DB to ensure fresh data
+        await loadQuestions();
         res.json(state.questions);
     });
 
     // Get Settings
-    app.get('/api/settings', (req, res) => {
+    app.get('/api/settings', async (req, res) => {
+        await loadSettings();
         res.json(state.settings);
     });
 
     // Update Settings
-    app.post('/api/settings', (req, res) => {
+    app.post('/api/settings', async (req, res) => {
         const newSettings = req.body;
         if (!newSettings || !newSettings.theme) {
             return res.status(400).json({ error: 'Formato inválido' });
         }
 
-        fs.writeFile(settingsPath, JSON.stringify(newSettings, null, 2), (err) => {
-            if (err) {
-                log.error('Erro ao salvar configurações:', err);
-                return res.status(500).json({ error: 'Erro ao salvar arquivo' });
-            }
+        try {
+            await query(
+                'INSERT INTO settings (key, value) VALUES ($1, $2) ON CONFLICT (key) DO UPDATE SET value = $2',
+                ['global', newSettings]
+            );
+
             log.info(`Configurações atualizadas: ${newSettings.theme}`);
 
             // Reload state
-            loadSettings();
+            await loadSettings();
 
             // Emit to everyone
             io.emit('game-settings', state.settings);
 
             res.json({ success: true });
-        });
+        } catch (err) {
+            log.error('Erro ao salvar configurações no DB:', err);
+            return res.status(500).json({ error: 'Erro ao salvar configurações' });
+        }
     });
 
     // Save Questions
-    app.post('/api/questions', (req, res) => {
+    app.post('/api/questions', async (req, res) => {
         const newQuestions = req.body;
         if (!Array.isArray(newQuestions)) {
             return res.status(400).json({ error: 'Formato inválido' });
@@ -56,15 +64,37 @@ function setupRoutes(app, upload, io, PORT) {
             return res.status(400).json({ error: 'Dados incompletos' });
         }
 
-        fs.writeFile(questionsPath, JSON.stringify(newQuestions, null, 2), (err) => {
-            if (err) {
-                log.error('Erro ao salvar perguntas:', err);
-                return res.status(500).json({ error: 'Erro ao salvar arquivo' });
+        const client = await pool.connect();
+        try {
+            await client.query('BEGIN');
+
+            // Full replace strategy (simplest for now)
+            await client.query('DELETE FROM questions');
+
+            const queryText = `
+                INSERT INTO questions (id, type, question, time, image, options, correct)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
+            `;
+
+            for (const q of newQuestions) {
+                // Ensure ID is unique/exists. Front sends timestamp as ID.
+                const id = q.id || Date.now();
+                await client.query(queryText, [
+                    id,
+                    q.type || 'quiz',
+                    q.question,
+                    q.time || 20,
+                    q.image || '',
+                    JSON.stringify(q.options),
+                    q.correct || 0
+                ]);
             }
-            log.info('Perguntas atualizadas via Admin!');
+
+            await client.query('COMMIT');
+            log.info('Perguntas atualizadas via Admin (DB)!');
 
             // Reload state
-            loadQuestions();
+            await loadQuestions();
 
             // Reset game to apply changes
             state.game.phase = 'waiting';
@@ -80,7 +110,13 @@ function setupRoutes(app, upload, io, PORT) {
             io.to('players-room').emit('game-reset');
 
             res.json({ success: true });
-        });
+        } catch (err) {
+            await client.query('ROLLBACK');
+            log.error('Erro ao salvar perguntas no DB:', err);
+            return res.status(500).json({ error: 'Erro ao salvar perguntas' });
+        } finally {
+            client.release();
+        }
     });
 
     // QR Code

@@ -1,9 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { log } = require('./utils');
-
-const questionsPath = path.join(__dirname, '../data/questions.json');
-const settingsPath = path.join(__dirname, '../data/settings.json');
+const { query } = require('./db');
 
 const state = {
     questions: [],
@@ -20,34 +18,46 @@ const state = {
     }
 };
 
-function loadQuestions() {
+async function loadQuestions() {
     try {
-        if (fs.existsSync(questionsPath)) {
-            state.questions = JSON.parse(fs.readFileSync(questionsPath, 'utf-8'));
-            log.info(`Perguntas carregadas: ${state.questions.length}`);
+        const res = await query('SELECT * FROM questions ORDER BY id ASC');
+        if (res.rows.length > 0) {
+            state.questions = res.rows.map(row => ({
+                id: parseInt(row.id),
+                type: row.type,
+                question: row.question,
+                time: row.time,
+                image: row.image,
+                options: row.options,
+                correct: row.correct
+            }));
+            log.info(`Perguntas carregadas do DB: ${state.questions.length}`);
         } else {
             state.questions = [];
-            log.warn('Arquivo standard de perguntas não encontrado.');
+            log.warn('Nenhuma pergunta encontrada no banco de dados.');
         }
     } catch (e) {
-        log.error('Erro ao carregar perguntas:', e);
+        log.error('Erro ao carregar perguntas do DB:', e);
         state.questions = [];
     }
     return state.questions;
 }
 
-// Initial load
-loadQuestions();
-loadSettings();
+// Initial load is now async, handled in server.js or initDB
+// We can leave this empty or removed, but routes call it.
+// Ideally, routes should call it and await.
 
-function loadSettings() {
+async function loadSettings() {
     try {
-        if (fs.existsSync(settingsPath)) {
-            state.settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+        const res = await query('SELECT value FROM settings WHERE key = $1', ['global']);
+        if (res.rows.length > 0) {
+            state.settings = res.rows[0].value;
             log.info(`Configurações carregadas: ${JSON.stringify(state.settings)}`);
         } else {
             state.settings = { theme: 'default' };
-            log.warn('Arquivo de configurações não encontrado. Usando padrão.');
+            // Save default
+            await query('INSERT INTO settings (key, value) VALUES ($1, $2)', ['global', state.settings]);
+            log.warn('Configurações padrão criadas.');
         }
     } catch (e) {
         log.error('Erro ao carregar configurações:', e);
@@ -79,7 +89,5 @@ module.exports = {
     getPlayerList,
     getRanking,
     getRanking,
-    questionsPath,
-    settingsPath,
     loadSettings
 };

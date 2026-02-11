@@ -8,6 +8,7 @@ const multer = require('multer');
 const { log, getLocalIp } = require('./src/utils');
 const setupRoutes = require('./src/routes');
 const setupSocket = require('./src/socket');
+const { initDB } = require('./src/db');
 
 // --- Configure Multer (Uploads) ---
 let upload;
@@ -109,14 +110,16 @@ setupSocket(io);
 
 // --- Start ---
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, '0.0.0.0', () => {
-  log.info(`\n🎮 Quiz Server rodando na porta ${PORT}`);
-  if (FRONTEND_URL) {
-    log.info(`🌐 Frontend: ${FRONTEND_URL}`);
-  } else {
-    log.info(`📺 Host: http://localhost:${PORT}/host`);
-    log.info(`📱 Jogadores: http://${LOCAL_IP}:${PORT}`);
-  }
-  const { state } = require('./src/gameState');
-  log.info(`🔑 PIN: ${state.game.pin}\n`);
+initDB().then(() => {
+  server.listen(PORT, '0.0.0.0', () => {
+    log.info(`\n🎮 Quiz Server rodando na porta ${PORT}`);
+    if (FRONTEND_URL) {
+      log.info(`🌐 Frontend: ${FRONTEND_URL}`);
+    } else {
+      log.info(`📺 Host: http://localhost:${PORT}/host`);
+      log.info(`📱 Jogadores: http://${LOCAL_IP}:${PORT}`);
+    }
+    const { state } = require('./src/gameState');
+    log.info(`🔑 PIN: ${state.game.pin}\n`);
+  });
 });
