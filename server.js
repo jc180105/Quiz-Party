@@ -46,8 +46,9 @@ const FRONTEND_URL = process.env.FRONTEND_URL || '';
 const allowedOrigins = [
   `http://localhost:3000`,
   `http://${LOCAL_IP}:3000`,
+  'https://quizparty.vercel.app',
 ];
-if (FRONTEND_URL) allowedOrigins.push(FRONTEND_URL);
+if (FRONTEND_URL && !allowedOrigins.includes(FRONTEND_URL)) allowedOrigins.push(FRONTEND_URL);
 
 const io = new Server(server, {
   cors: {

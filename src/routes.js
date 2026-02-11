@@ -57,16 +57,10 @@ function setupRoutes(app, upload, io, PORT) {
     // QR Code
     app.get('/api/qrcode', async (req, res) => {
         try {
-            const FRONTEND_URL = process.env.FRONTEND_URL || '';
-            let url;
-            if (FRONTEND_URL) {
-                // Production: QR points to Vercel frontend
-                url = `${FRONTEND_URL}/player?pin=${state.game.pin}`;
-            } else {
-                // Dev: QR points to local IP
-                const protocol = req.protocol;
-                url = `${protocol}://${LOCAL_IP}:${PORT}/player?pin=${state.game.pin}`;
-            }
+            // Use request headers to auto-detect URL (works on Railway + local)
+            const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+            const host = req.get('host');
+            const url = `${protocol}://${host}/player?pin=${state.game.pin}`;
             const qr = await QRCode.toDataURL(url, { width: 300, margin: 2 });
             res.json({ qr, pin: state.game.pin, url });
         } catch (err) {
