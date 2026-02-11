@@ -40,6 +40,16 @@ async function initDB() {
         );
       `);
 
+            // Table: Images
+            await client.query(`
+        CREATE TABLE IF NOT EXISTS images (
+          id SERIAL PRIMARY KEY,
+          data BYTEA NOT NULL,
+          mime_type VARCHAR(50) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+
             await client.query('COMMIT');
             log.info('✅ Database initialized successfully');
         } catch (e) {

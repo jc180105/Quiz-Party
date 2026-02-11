@@ -134,33 +134,65 @@ function setupRoutes(app, upload, io, PORT) {
     });
 
     // Upload
-    app.post('/api/upload', upload.single('image'), (req, res) => {
+    app.post('/api/upload', upload.single('image'), async (req, res) => {
         if (!req.file) {
             log.error('Upload falhou: Nenhum arquivo recebido.');
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
 
-        log.info('📁 Arquivo recebido:', {
+        log.info('📁 Arquivo recebido (Memória):', {
             mimetype: req.file.mimetype,
-            path: req.file.path,
-            filename: req.file.filename
+            size: req.file.size
         });
 
-        // Cloudinary returns .path (full URL), Local returns .filename
-        let url;
-        if (req.file.path && req.file.path.startsWith('http')) {
-            url = req.file.path; // Cloudinary URL
-        } else {
-            // Local fallback
-            // Return full URL so frontend (Vercel) can display images from backend (Railway)
-            const BACKEND_URL = process.env.RAILWAY_PUBLIC_DOMAIN
-                ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-                : '';
-            url = `${BACKEND_URL}/uploads/${req.file.filename}`;
-            log.warn('⚠️ Usando URL local (Cloudinary não retornou URL HTTP):', url);
-        }
+        try {
+            // Save to DB
+            const resDb = await query(
+                'INSERT INTO images (data, mime_type) VALUES ($1, $2) RETURNING id',
+                [req.file.buffer, req.file.mimetype]
+            );
 
-        res.json({ url });
+            const newId = resDb.rows[0].id;
+
+            // Construct URL
+            const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+            const host = req.headers['x-forwarded-host'] || req.get('host');
+            // If on Railway, use public domain if available, else standard construction
+            const baseUrl = process.env.RAILWAY_PUBLIC_DOMAIN
+                ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+                : `${protocol}://${host}`;
+
+            const url = `${baseUrl}/api/images/${newId}`;
+
+            log.info('✅ Imagem salva no DB:', url);
+            res.json({ url });
+        } catch (err) {
+            log.error('Erro ao salvar imagem no DB:', err);
+            res.status(500).json({ error: 'Erro ao salvar imagem' });
+        }
+    });
+
+    // Serve Image from DB
+    app.get('/api/images/:id', async (req, res) => {
+        try {
+            const id = parseInt(req.params.id);
+            if (isNaN(id)) return res.status(400).send('ID inválido');
+
+            const result = await query('SELECT data, mime_type FROM images WHERE id = $1', [id]);
+
+            if (result.rows.length === 0) {
+                return res.status(404).send('Imagem não encontrada');
+            }
+
+            const img = result.rows[0];
+            res.setHeader('Content-Type', img.mime_type);
+            // Cache control for performance
+            res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 day
+            res.send(img.data);
+        } catch (err) {
+            log.error('Erro ao servir imagem:', err);
+            res.status(500).send('Erro interno');
+        }
     });
 
     // --- Page Routes ---

@@ -34,15 +34,8 @@ if (process.env.CLOUDINARY_CLOUD_NAME) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
-  const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-      const safeName = file.originalname.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-      cb(null, Date.now() + '-' + safeName);
-    }
-  });
+  // Use Memory Storage for DB persistence
+  const storage = multer.memoryStorage();
 
   upload = multer({
     storage: storage,
