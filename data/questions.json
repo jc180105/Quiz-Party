@@ -1,0 +1,92 @@
+[
+  {
+    "id": 1770783037811,
+    "type": "boolean",
+    "question": "asd",
+    "time": 20,
+    "image": "/uploads/1770783047197-gemini_generated_image_yefgs3yefgs3yefg.png",
+    "options": [
+      {
+        "text": "False",
+        "color": "red",
+        "shape": "triangle"
+      },
+      {
+        "text": "True",
+        "color": "blue",
+        "shape": "diamond"
+      },
+      {
+        "text": "",
+        "color": "yellow",
+        "shape": "circle"
+      },
+      {
+        "text": "",
+        "color": "green",
+        "shape": "square"
+      }
+    ],
+    "correct": 0
+  },
+  {
+    "id": 1770785565266,
+    "type": "quiz",
+    "question": "dsa",
+    "time": 20,
+    "image": "/uploads/1770785620023-gemini_generated_image_yefgs3yefgs3yefg.png",
+    "options": [
+      {
+        "text": "as",
+        "color": "red",
+        "shape": "triangle"
+      },
+      {
+        "text": "as",
+        "color": "blue",
+        "shape": "diamond"
+      },
+      {
+        "text": "",
+        "color": "yellow",
+        "shape": "circle"
+      },
+      {
+        "text": "",
+        "color": "green",
+        "shape": "square"
+      }
+    ],
+    "correct": 0
+  },
+  {
+    "id": 1770785622313,
+    "type": "quiz",
+    "question": "asa",
+    "time": 20,
+    "image": "OK",
+    "options": [
+      {
+        "text": "as",
+        "color": "red",
+        "shape": "triangle"
+      },
+      {
+        "text": "s",
+        "color": "blue",
+        "shape": "diamond"
+      },
+      {
+        "text": "a",
+        "color": "yellow",
+        "shape": "circle"
+      },
+      {
+        "text": "a",
+        "color": "green",
+        "shape": "square"
+      }
+    ],
+    "correct": 0
+  }
+]

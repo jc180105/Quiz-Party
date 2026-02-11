@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz — Tela do Host</title>
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎂</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/host.css">
+</head>
+
+<body>
+  <!-- WAITING SCREEN -->
+  <div id="screen-waiting" class="screen active">
+    <div class="waiting-container">
+      <div class="logo-area">
+        <h1 class="logo">🎂 Quiz da Ana Júlia</h1>
+        <p class="logo-sub">Aniversário Interativo</p>
+      </div>
+      <div class="join-info">
+        <div class="join-card">
+          <div class="join-instructions">
+            <p>Acesse no celular:</p>
+            <div class="join-url" id="join-url">carregando...</div>
+          </div>
+          <div class="join-divider">ou</div>
+          <div class="qr-area">
+            <img id="qr-code" src="" alt="QR Code">
+          </div>
+          <div class="pin-area">
+            <p>Game PIN:</p>
+            <div class="pin-display" id="pin-display">------</div>
+          </div>
+        </div>
+      </div>
+      <div class="players-area">
+        <div class="players-header">
+          <span class="players-icon">👥</span>
+          <span class="players-count" id="player-count">0</span>
+          <span>jogadores conectados</span>
+        </div>
+        <div class="players-grid" id="players-grid"></div>
+      </div>
+      <button class="btn-start" id="btn-start" disabled>
+        <span>Iniciar Quiz</span>
+        <span class="btn-icon">🚀</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="screen-question" class="screen">
+    <div class="question-container">
+      <div class="question-header">
+        <div class="timer-circle" id="timer-circle">
+          <svg viewBox="0 0 100 100">
+            <circle class="timer-bg" cx="50" cy="50" r="45" />
+            <circle class="timer-progress" id="timer-progress" cx="50" cy="50" r="45" />
+          </svg>
+          <span class="timer-text" id="timer-text">20</span>
+        </div>
+        <div class="question-text-area">
+          <div class="question-counter" id="question-counter">1 / 15</div>
+          <h2 class="question-text" id="question-text">Pergunta aqui</h2>
+        </div>
+        <div class="answer-counter">
+          <span class="answer-count" id="answer-count">0</span>
+          <span class="answer-label">respostas</span>
+        </div>
+      </div>
+      <div class="question-media" id="question-media">🎂</div>
+      <div class="options-grid">
+        <div class="option option-red" id="opt-0">
+          <span class="option-shape">▲</span>
+          <span class="option-text" id="opt-text-0">Opção 1</span>
+        </div>
+        <div class="option option-blue" id="opt-1">
+          <span class="option-shape">◆</span>
+          <span class="option-text" id="opt-text-1">Opção 2</span>
+        </div>
+        <div class="option option-yellow" id="opt-2">
+          <span class="option-shape">●</span>
+          <span class="option-text" id="opt-text-2">Opção 3</span>
+        </div>
+        <div class="option option-green" id="opt-3">
+          <span class="option-shape">■</span>
+          <span class="option-text" id="opt-text-3">Opção 4</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS SCREEN -->
+  <div id="screen-results" class="screen">
+    <div class="results-container">
+      <h2 class="results-title" id="results-title">Resposta Correta!</h2>
+      <div class="correct-answer" id="correct-answer">
+        <span class="correct-shape" id="correct-shape">▲</span>
+        <span class="correct-text" id="correct-text">Resposta</span>
+      </div>
+      <div class="answer-chart" id="answer-chart">
+        <div class="chart-bar chart-red">
+          <div class="bar-fill" id="bar-0"></div><span class="bar-label">0</span>
+        </div>
+        <div class="chart-bar chart-blue">
+          <div class="bar-fill" id="bar-1"></div><span class="bar-label">0</span>
+        </div>
+        <div class="chart-bar chart-yellow">
+          <div class="bar-fill" id="bar-2"></div><span class="bar-label">0</span>
+        </div>
+        <div class="chart-bar chart-green">
+          <div class="bar-fill" id="bar-3"></div><span class="bar-label">0</span>
+        </div>
+      </div>
+      <div class="top5-area">
+        <h3>🏆 Top 5</h3>
+        <div class="top5-list" id="top5-list"></div>
+      </div>
+      <button class="btn-next" id="btn-next">
+        <span id="btn-next-text">Próxima Pergunta →</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PODIUM SCREEN -->
+  <div id="screen-podium" class="screen">
+    <div class="podium-container">
+      <h1 class="podium-title">🏆 Ranking Final 🏆</h1>
+      <div class="podium-visual">
+        <div class="podium-place podium-2nd" id="podium-2">
+          <div class="podium-medal">🥈</div>
+          <div class="podium-avatar-wrapper">
+            <div class="podium-avatar" id="podium-avatar-2"></div>
+          </div>
+          <div class="podium-name" id="podium-name-2">---</div>
+          <div class="podium-score" id="podium-score-2">0 pts</div>
+          <div class="podium-block podium-block-2">2°</div>
+        </div>
+        <div class="podium-place podium-1st" id="podium-1">
+          <div class="podium-medal">🥇</div>
+          <div class="podium-avatar-wrapper podium-avatar-winner">
+            <div class="podium-crown">👑</div>
+            <div class="podium-avatar" id="podium-avatar-1"></div>
+          </div>
+          <div class="podium-name" id="podium-name-1">---</div>
+          <div class="podium-score" id="podium-score-1">0 pts</div>
+          <div class="podium-block podium-block-1">1°</div>
+        </div>
+        <div class="podium-place podium-3rd" id="podium-3">
+          <div class="podium-medal">🥉</div>
+          <div class="podium-avatar-wrapper">
+            <div class="podium-avatar" id="podium-avatar-3"></div>
+          </div>
+          <div class="podium-name" id="podium-name-3">---</div>
+          <div class="podium-score" id="podium-score-3">0 pts</div>
+          <div class="podium-block podium-block-3">3°</div>
+        </div>
+      </div>
+      <div class="full-ranking" id="full-ranking"></div>
+      <div style="display:flex;gap:12px;margin-top:10px;">
+        <button class="btn-reset" id="btn-reset">🔄 Novo Quiz</button>
+        <a href="/painel" class="btn-reset" style="text-decoration:none;background:#864cbf;">📋 Painel</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/host.js"></script>
+</body>
+
+</html>

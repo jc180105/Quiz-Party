@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel - Quiz Ana Júlia</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎂</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f2f2f2;
+            --primary: #46178f;
+            --secondary: #864cbf;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: #333;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            height: 350px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+            background: #f8f8f8;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 300px;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .btn-play {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-create {
+            background: var(--white);
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 20px;
+            background: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div class="logo">K! Quiz Ana Júlia</div>
+    </div>
+
+    <div class="container">
+        <!-- Card Jogar -->
+        <a href="/host" class="card">
+            <div class="icon">🎮</div>
+            <h2>Jogar Agora</h2>
+            <p>Inicie o quiz no telão para seus convidados participarem pelo celular.</p>
+            <span class="question-count" id="question-count"></span>
+            <span class="btn btn-play">Iniciar Host</span>
+        </a>
+
+        <!-- Card Criar -->
+        <a href="/creator" class="card">
+            <div class="icon">✏️</div>
+            <h2>Criar Quiz</h2>
+            <p>Crie ou edite suas perguntas no editor visual estilo Kahoot.</p>
+            <span class="btn btn-create">Abrir Editor</span>
+        </a>
+    </div>
+
+    <script>
+        fetch('/api/questions')
+            .then(r => r.json())
+            .then(data => {
+                const el = document.getElementById('question-count');
+                el.textContent = `📝 ${data.length} perguntas prontas`;
+                el.style.cssText = 'font-size:0.95rem;font-weight:600;color:#666;background:#f0f0f0;padding:6px 14px;border-radius:20px;';
+            });
+    </script>
+
+</body>
+
+</html>

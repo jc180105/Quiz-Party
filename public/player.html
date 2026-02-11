@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Quiz — Entrar no Jogo</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎂</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/player.css">
+</head>
+
+<body>
+    <!-- JOIN SCREEN -->
+    <div id="screen-join" class="screen active">
+        <div class="join-container">
+            <h1 class="join-logo">🎂</h1>
+            <h2 class="join-title">Quiz da Ana Júlia</h2>
+            <div class="join-form">
+                <input type="text" id="input-pin" class="join-input" placeholder="Game PIN" maxlength="6"
+                    inputmode="numeric">
+                <input type="text" id="input-name" class="join-input" placeholder="Seu apelido" maxlength="20">
+
+                <!-- Avatar Upload -->
+                <div class="avatar-upload-container">
+                    <div class="avatar-preview" id="avatar-preview">
+                        <span class="avatar-placeholder">📷</span>
+                        <img id="avatar-img" src="" style="display:none;">
+                    </div>
+                    <label for="avatar-input" class="btn-avatar-upload">Escolher Foto</label>
+                    <input type="file" id="avatar-input" accept="image/*" style="display:none;">
+                </div>
+
+                <button class="btn-join" id="btn-join">Entrar! 🎉</button>
+            </div>
+            <p class="join-error" id="join-error"></p>
+        </div>
+    </div>
+
+    <!-- LOBBY SCREEN -->
+    <div id="screen-lobby" class="screen">
+        <div class="lobby-container">
+            <div class="lobby-icon">✅</div>
+            <h2 class="lobby-title">Você está dentro!</h2>
+            <p class="lobby-name" id="lobby-name">Nome</p>
+            <div class="lobby-waiting">
+                <div class="loader"></div>
+                <p>Aguardando o host iniciar o quiz...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ANSWER SCREEN -->
+    <div id="screen-answer" class="screen">
+        <div class="answer-container">
+            <div class="answer-timer" id="answer-timer">20</div>
+            <div class="answer-counter-text" id="answer-counter-text">Pergunta 1 / 15</div>
+            <div class="answer-question-text" id="answer-question-text"></div>
+            <div class="answer-grid">
+                <button class="answer-btn answer-red" data-index="0" id="ans-0">
+                    <span class="answer-shape">▲</span>
+                </button>
+                <button class="answer-btn answer-blue" data-index="1" id="ans-1">
+                    <span class="answer-shape">◆</span>
+                </button>
+                <button class="answer-btn answer-yellow" data-index="2" id="ans-2">
+                    <span class="answer-shape">●</span>
+                </button>
+                <button class="answer-btn answer-green" data-index="3" id="ans-3">
+                    <span class="answer-shape">■</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FEEDBACK SCREEN -->
+    <div id="screen-feedback" class="screen">
+        <div class="feedback-container">
+            <div class="feedback-icon" id="feedback-icon">✅</div>
+            <h2 class="feedback-title" id="feedback-title">Correto!</h2>
+            <p class="feedback-points" id="feedback-points">+1500 pts</p>
+            <p class="feedback-streak" id="feedback-streak">🔥 Streak: 3</p>
+        </div>
+    </div>
+
+    <!-- WAITING NEXT SCREEN -->
+    <div id="screen-wait-next" class="screen">
+        <div class="wait-container">
+            <div class="loader"></div>
+            <p>Aguardando próxima pergunta...</p>
+        </div>
+    </div>
+
+    <!-- FINAL RANK SCREEN -->
+    <div id="screen-final" class="screen">
+        <div class="final-container">
+            <h1 class="final-title">🏆 Resultado Final</h1>
+            <div class="final-your-rank" id="final-your-rank">
+                <span class="final-position" id="final-position">1°</span>
+                <span class="final-name" id="final-name">Você</span>
+            </div>
+            <div class="final-your-score" id="final-your-score">0 pts</div>
+            <div class="final-message" id="final-message">Parabéns! 🎉</div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/player.js"></script>
+</body>
+
+</html>

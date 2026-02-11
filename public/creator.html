@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator - Quiz Ana Júlia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/creator.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <div class="logo">K!</div>
+        <div class="quiz-title">
+            <input type="text" value="Quiz Ana Júlia" placeholder="Enter kahoot title...">
+        </div>
+        <div class="top-actions">
+            <button class="btn btn-secondary" id="btn-exit">Exit</button>
+            <button class="btn btn-secondary" id="btn-play-all" title="Preview Full Quiz">▶ Play All</button>
+            <button class="btn btn-secondary" id="btn-preview" title="Preview Current Slide">👁️ This Slide</button>
+            <button class="btn btn-primary" id="btn-save">Save</button>
+        </div>
+    </div>
+
+    <div class="creator-layout">
+        <!-- LEFT SIDEBAR: SLIDES -->
+        <div class="sidebar-left">
+            <div class="slides-list" id="slides-list">
+                <!-- Slides renderizados via JS -->
+            </div>
+        </div>
+
+        <!-- CENTER: CANVAS -->
+        <div class="editor-area">
+            <div class="canvas">
+                <!-- Question Input -->
+                <div class="question-input-wrapper">
+                    <input type="text" id="input-question" placeholder="Start typing your question" autocomplete="off">
+                </div>
+
+                <!-- Media Area -->
+                <div class="media-area">
+                    <!-- Placeholder (shown when no media) -->
+                    <div id="media-placeholder" class="media-placeholder">
+                        <div class="media-icon">🖼️</div>
+                        <p>Find and insert media</p>
+                        <div class="media-buttons">
+                            <button id="btn-trigger-upload" class="btn-upload">🖼️ Image</button>
+                            <button id="btn-trigger-emoji" class="btn-upload">😀 Emoji</button>
+                        </div>
+                        <input type="file" id="file-upload" accept="image/*" style="display:none">
+                    </div>
+                    <!-- Emoji Input (hidden by default) -->
+                    <div id="emoji-input-container" class="emoji-input-container" style="display:none">
+                        <input type="text" id="input-emoji" placeholder="Cole um emoji (ex: 🎂)" class="setting-input">
+                        <button id="btn-set-emoji" class="btn-upload">✅ OK</button>
+                    </div>
+                    <!-- Preview (shown when media is set) -->
+                    <div id="media-preview" class="media-preview" style="display:none">
+                        <div id="media-content" class="media-content"></div>
+                        <button id="btn-remove-media" class="btn-remove-media"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+
+                <!-- Answers Grid -->
+                <!-- Answers Grid -->
+                <div class="answers-grid">
+                    <!-- Answer 1 (Red) -->
+                    <div class="answer-card red" id="card-0">
+                        <div class="answer-shape">▲</div>
+                        <input type="text" id="ans-0" placeholder="Add answer 1">
+                        <div class="answer-actions">
+                            <div class="answer-radio">
+                                <input type="radio" name="correct-ans" id="radio-0" value="0">
+                                <label for="radio-0" class="radio-circle"></label>
+                            </div>
+                            <button class="btn-del-ans" data-idx="0" title="Delete answer"><i
+                                    class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <!-- Answer 2 (Blue) -->
+                    <div class="answer-card blue" id="card-1">
+                        <div class="answer-shape">◆</div>
+                        <input type="text" id="ans-1" placeholder="Add answer 2">
+                        <div class="answer-actions">
+                            <div class="answer-radio">
+                                <input type="radio" name="correct-ans" id="radio-1" value="1">
+                                <label for="radio-1" class="radio-circle"></label>
+                            </div>
+                            <button class="btn-del-ans" data-idx="1" title="Delete answer"><i
+                                    class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <!-- Answer 3 (Yellow) -->
+                    <div class="answer-card yellow" id="card-2">
+                        <div class="answer-shape">●</div>
+                        <input type="text" id="ans-2" placeholder="Add answer 3 (optional)">
+                        <div class="answer-actions">
+                            <div class="answer-radio">
+                                <input type="radio" name="correct-ans" id="radio-2" value="2">
+                                <label for="radio-2" class="radio-circle"></label>
+                            </div>
+                            <button class="btn-del-ans" data-idx="2" title="Delete answer"><i
+                                    class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <!-- Answer 4 (Green) -->
+                    <div class="answer-card green" id="card-3">
+                        <div class="answer-shape">■</div>
+                        <input type="text" id="ans-3" placeholder="Add answer 4 (optional)">
+                        <div class="answer-actions">
+                            <div class="answer-radio">
+                                <input type="radio" name="correct-ans" id="radio-3" value="3">
+                                <label for="radio-3" class="radio-circle"></label>
+                            </div>
+                            <button class="btn-del-ans" data-idx="3" title="Delete answer"><i
+                                    class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="add-answer-row">
+                    <button id="btn-add-answer" class="btn-circle-add" title="Add answer"><i
+                            class="fas fa-plus"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDEBAR: SETTINGS -->
+        <div class="sidebar-right">
+            <div class="setting-group">
+                <label><i class="fas fa-question-circle"></i> Question type</label>
+                <select id="select-type" class="setting-select">
+                    <option value="quiz">Quiz</option>
+                    <option value="boolean">True or False</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label><i class="fas fa-clock"></i> Time limit</label>
+                <select id="select-time" class="setting-select">
+                    <option value="5">5 seconds</option>
+                    <option value="10">10 seconds</option>
+                    <option value="20" selected>20 seconds</option>
+                    <option value="30">30 seconds</option>
+                    <option value="60">60 seconds</option>
+                    <option value="90">90 seconds</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label><i class="fas fa-trophy"></i> Points</label>
+                <select id="select-points" class="setting-select">
+                    <option value="standard">Standard</option>
+                    <option value="double">Double points</option>
+                    <option value="no">No points</option>
+                </select>
+            </div>
+
+
+
+            <div class="delete-area">
+                <button class="btn-delete" id="btn-delete">Delete</button>
+                <button class="btn-duplicate" id="btn-duplicate">Duplicate</button>
+                <button class="btn-add-slide" id="btn-add-slide">Add question</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW MODAL -->
+    <div id="preview-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-content host-style">
+            <button class="btn-close-modal" id="btn-close-preview">×</button>
+
+            <div class="preview-nav">
+                <button id="prev-slide" class="nav-btn">❮</button>
+                <div class="preview-container">
+                    <h1 id="preview-question">Question Text</h1>
+                    <div class="preview-media" id="preview-media-modal"></div>
+                    <div class="preview-options">
+                        <div class="p-opt red" id="p-card-0">▲ <span id="p-opt-0"></span></div>
+                        <div class="p-opt blue" id="p-card-1">◆ <span id="p-opt-1"></span></div>
+                        <div class="p-opt yellow" id="p-card-2">● <span id="p-opt-2"></span></div>
+                        <div class="p-opt green" id="p-card-3">■ <span id="p-opt-3"></span></div>
+                    </div>
+                </div>
+                <button id="next-slide" class="nav-btn">❯</button>
+            </div>
+            <div class="preview-counter" style="text-align:center; margin-top:10px; color:rgba(255,255,255,0.5)">
+                <span id="preview-index">1</span> / <span id="preview-total">10</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/creator.js"></script>
+</body>
+
+</html>

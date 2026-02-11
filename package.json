@@ -1,0 +1,16 @@
+{
+  "name": "quiz-aniversario-ana-julia",
+  "version": "1.0.0",
+  "description": "Quiz interativo estilo Kahoot para 50+ jogadores",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "qrcode": "^1.5.3",
+    "socket.io": "^4.7.4"
+  }
+}
