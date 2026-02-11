@@ -71,8 +71,15 @@ function setupRoutes(app, upload, io, PORT) {
     // Upload
     app.post('/api/upload', upload.single('image'), (req, res) => {
         if (!req.file) {
+            log.error('Upload falhou: Nenhum arquivo recebido.');
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
+
+        log.info('📁 Arquivo recebido:', {
+            mimetype: req.file.mimetype,
+            path: req.file.path,
+            filename: req.file.filename
+        });
 
         // Cloudinary returns .path (full URL), Local returns .filename
         let url;
@@ -85,6 +92,7 @@ function setupRoutes(app, upload, io, PORT) {
                 ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
                 : '';
             url = `${BACKEND_URL}/uploads/${req.file.filename}`;
+            log.warn('⚠️ Usando URL local (Cloudinary não retornou URL HTTP):', url);
         }
 
         res.json({ url });

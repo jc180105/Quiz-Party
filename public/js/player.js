@@ -63,9 +63,14 @@ if (avatarPreview && avatarInput) {
             if (res.ok) {
                 const data = await res.json();
                 avatarUrl = data.url;
+                console.log('Avatar upload success:', avatarUrl);
+            } else {
+                console.error('Upload failed:', await res.text());
+                alert('Erro ao enviar foto. Tente uma imagem menor.');
             }
         } catch (err) {
             console.error('Upload error', err);
+            alert('Erro de conexão ao enviar foto.');
         }
     });
 }
