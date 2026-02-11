@@ -207,21 +207,13 @@ function setupSocket(io) {
         // Reset
         socket.on('reset-game', () => {
             if (socket.id !== gameState.hostSocket) return;
-            const { generatePin } = require('./gameState'); // Import dynamically to avoid cycle if needed, or stick to module import
-            // Note: generatePin is in gameState module
 
+            clearInterval(gameState.timerInterval);
             gameState.phase = 'waiting';
             gameState.currentQuestion = -1;
-            gameState.pin = require('./gameState').generatePin(); // Recalculate pin
-            // Actually I should import generatePin at top
-
-            gameState.players.forEach(p => {
-                p.score = 0;
-                p.streak = 0;
-                p.answers = [];
-            });
+            gameState.pin = generatePin();
+            gameState.players.clear();
             gameState.answers.clear();
-            clearInterval(gameState.timerInterval);
 
             io.to('host-room').emit('game-pin', { pin: gameState.pin });
             io.to('host-room').emit('game-reset');

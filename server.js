@@ -70,18 +70,32 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '1mb' }));
 
+// Health Check (Railway monitoring)
+app.get('/api/health', (req, res) => {
+  const { state } = require('./src/gameState');
+  res.json({
+    status: 'ok',
+    uptime: Math.round(process.uptime()),
+    players: state.game.players.size,
+    phase: state.game.phase,
+    questions: state.questions.length
+  });
+});
+
 // Setup Modules
 setupRoutes(app, upload, io, process.env.PORT || 3000);
 setupSocket(io);
 
 // --- Start ---
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  log.info(`\n🎮 Quiz Server rodando!`);
-  log.info(`📺 Host (Telão): http://localhost:${PORT}/host`);
-  log.info(`📱 Jogadores (Celular): http://${LOCAL_IP}:${PORT}`);
-  // Note: PIN is now generated inside gameState but logged inside socket connection usually.
-  // We can log it here if we import state, but checking logs is enough.
+server.listen(PORT, '0.0.0.0', () => {
+  log.info(`\n🎮 Quiz Server rodando na porta ${PORT}`);
+  if (FRONTEND_URL) {
+    log.info(`🌐 Frontend: ${FRONTEND_URL}`);
+  } else {
+    log.info(`📺 Host: http://localhost:${PORT}/host`);
+    log.info(`📱 Jogadores: http://${LOCAL_IP}:${PORT}`);
+  }
   const { state } = require('./src/gameState');
   log.info(`🔑 PIN: ${state.game.pin}\n`);
 });
