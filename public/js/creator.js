@@ -500,6 +500,69 @@ btnSave.addEventListener('click', async () => {
     }
 });
 
+// --- BACKUP / RESTORE ---
+const btnExport = document.getElementById('btn-export');
+const btnImport = document.getElementById('btn-import');
+const fileImport = document.getElementById('file-import');
+
+if (btnExport) {
+    btnExport.addEventListener('click', () => {
+        saveCurrentState();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(questions, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "quiz-party-backup.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    });
+}
+
+if (btnImport) {
+    btnImport.addEventListener('click', () => {
+        if (confirm('Importing will overwrite current questions. Continue?')) {
+            fileImport.click();
+        }
+    });
+}
+
+if (fileImport) {
+    fileImport.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            try {
+                const json = JSON.parse(e.target.result);
+                if (Array.isArray(json)) {
+                    questions = json;
+                    // Save to server
+                    const res = await fetch(API_URL + '/api/questions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(questions)
+                    });
+
+                    if (res.ok) {
+                        alert('Quiz imported successfully! Reloading...');
+                        location.reload();
+                    } else {
+                        alert('Error saving imported quiz.');
+                    }
+                } else {
+                    alert('Invalid JSON format: Expected an array.');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Error parsing JSON file.');
+            }
+        };
+        reader.readAsText(file);
+        event.target.value = ''; // Reset
+    });
+}
+
 // --- PREVIEW & EXIT ---
 const modalPreview = document.getElementById('preview-modal');
 const btnPreview = document.getElementById('btn-preview');
@@ -648,126 +711,7 @@ modalPreview.addEventListener('click', (e) => {
     if (e.target === modalPreview) modalPreview.style.display = 'none';
 });
 
-
-// --- SETTINGS LOGIC ---
-const btnSettings = document.getElementById('btn-settings');
-const modalSettings = document.getElementById('settings-modal');
-const btnCloseSettings = document.getElementById('btn-close-settings');
-const btnSaveSettings = document.getElementById('btn-save-settings');
-const themeRadios = document.querySelectorAll('input[name="theme"]');
-
-btnSettings.addEventListener('click', async () => {
-    // Fetch current settings
-    try {
-        const res = await fetch(API_URL + '/api/settings');
-        const settings = await res.json();
-
-        // Update UI
-        themeRadios.forEach(radio => {
-            radio.checked = (radio.value === settings.theme);
-        });
-
-        modalSettings.style.display = 'flex';
-    } catch (e) {
-        console.error('Erro ao carregar settings', e);
-        alert('Erro ao carregar configurações');
-    }
-});
-
-btnCloseSettings.addEventListener('click', () => {
-    modalSettings.style.display = 'none';
-});
-
-btnSaveSettings.addEventListener('click', async () => {
-    const selectedTheme = document.querySelector('input[name="theme"]:checked').value;
-
-    try {
-        const res = await fetch(API_URL + '/api/settings', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ theme: selectedTheme })
-        });
-
-        if (res.ok) {
-            modalSettings.style.display = 'none';
-            // Optional: Feedback?
-        } else {
-            alert('Erro ao salvar configurações');
-        }
-    } catch (e) {
-        console.error(e);
-        alert('Erro de conexão');
-    }
-});
-
-modalSettings.addEventListener('click', (e) => {
-    if (e.target === modalSettings) modalSettings.style.display = 'none';
-});
-
-
-// Start
 init();
 
-// --- SETTINGS LOGIC ---
-const btnSettings = document.getElementById('btn-settings');
-const modalSettings = document.getElementById('settings-modal');
-const btnCloseSettings = document.getElementById('btn-close-settings');
-const btnSaveSettings = document.getElementById('btn-save-settings');
-const themeRadios = document.querySelectorAll('input[name="theme"]');
 
-if (btnSettings) {
-    btnSettings.addEventListener('click', async () => {
-        // Fetch current settings
-        try {
-            const res = await fetch(API_URL + '/api/settings');
-            const settings = await res.json();
 
-            // Update UI
-            themeRadios.forEach(radio => {
-                radio.checked = (radio.value === settings.theme);
-            });
-
-            modalSettings.style.display = 'flex';
-        } catch (e) {
-            console.error('Erro ao carregar settings', e);
-            alert('Erro ao carregar configurações');
-        }
-    });
-}
-
-if (btnCloseSettings) {
-    btnCloseSettings.addEventListener('click', () => {
-        modalSettings.style.display = 'none';
-    });
-}
-
-if (btnSaveSettings) {
-    btnSaveSettings.addEventListener('click', async () => {
-        const selectedRadio = document.querySelector('input[name="theme"]:checked');
-        if (!selectedRadio) return;
-        const selectedTheme = selectedRadio.value;
-
-        try {
-            const res = await fetch(API_URL + '/api/settings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ theme: selectedTheme })
-            });
-
-            if (res.ok) {
-                modalSettings.style.display = 'none';
-            } else {
-                alert('Erro ao salvar configurações');
-            }
-        } catch (e) {
-            console.error(e);
-            alert('Erro de conexão');
-        }
-    });
-}
-
-if (modalSettings) {
-    modalSettings.addEventListener('click', (e) => {
-        if (e.target === modalSettings) modalSettings.style.display = 'none';
-    });
-}

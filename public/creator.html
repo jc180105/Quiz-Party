@@ -20,6 +20,9 @@
             <input type="text" value="Quiz Party" placeholder="Enter kahoot title...">
         </div>
         <div class="top-actions">
+            <button class="btn btn-secondary" id="btn-export" title="Backup Quiz">💾 Export</button>
+            <button class="btn btn-secondary" id="btn-import" title="Restore Quiz">📂 Import</button>
+            <input type="file" id="file-import" accept=".json" style="display:none">
             <button class="btn btn-secondary" id="btn-exit">Exit</button>
             <button class="btn btn-secondary" id="btn-settings" title="Game Settings">⚙️ Settings</button>
             <button class="btn btn-secondary" id="btn-play-all" title="Preview Full Quiz">▶ Play All</button>
@@ -197,35 +200,35 @@
             </div>
         </div>
 
-    <!-- SETTINGS MODAL -->
-    <div id="settings-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-content settings-content">
-            <button class="btn-close-modal" id="btn-close-settings">×</button>
-            <h2>⚙️ Game Settings</h2>
-            
-            <div class="setting-section">
-                <h3>Background Theme</h3>
-                <div class="theme-options">
-                    <label class="theme-option">
-                        <input type="radio" name="theme" value="default" checked>
-                        <div class="theme-preview theme-default">
-                            <span>Default (Gradient)</span>
-                        </div>
-                    </label>
-                    <label class="theme-option">
-                        <input type="radio" name="theme" value="disco">
-                        <div class="theme-preview theme-disco">
-                            <span>Disco Ball</span>
-                        </div>
-                    </label>
+        <!-- SETTINGS MODAL -->
+        <div id="settings-modal" class="modal-overlay" style="display:none;">
+            <div class="modal-content settings-content">
+                <button class="btn-close-modal" id="btn-close-settings">×</button>
+                <h2>⚙️ Game Settings</h2>
+
+                <div class="setting-section">
+                    <h3>Background Theme</h3>
+                    <div class="theme-options">
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="default" checked>
+                            <div class="theme-preview theme-default">
+                                <span>Default (Gradient)</span>
+                            </div>
+                        </label>
+                        <label class="theme-option">
+                            <input type="radio" name="theme" value="disco">
+                            <div class="theme-preview theme-disco">
+                                <span>Disco Ball</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
                 </div>
             </div>
-
-            <div class="modal-actions">
-                <button class="btn btn-primary" id="btn-save-settings">Save Settings</button>
-            </div>
         </div>
-    </div>
     </div>
 
     <script src="/js/config.js"></script>
