@@ -73,11 +73,20 @@ function setupRoutes(app, upload, io, PORT) {
         if (!req.file) {
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
-        // Return full URL so frontend (Vercel) can display images from backend (Railway)
-        const BACKEND_URL = process.env.RAILWAY_PUBLIC_DOMAIN
-            ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-            : '';
-        const url = `${BACKEND_URL}/uploads/${req.file.filename}`;
+
+        // Cloudinary returns .path (full URL), Local returns .filename
+        let url;
+        if (req.file.path && req.file.path.startsWith('http')) {
+            url = req.file.path; // Cloudinary URL
+        } else {
+            // Local fallback
+            // Return full URL so frontend (Vercel) can display images from backend (Railway)
+            const BACKEND_URL = process.env.RAILWAY_PUBLIC_DOMAIN
+                ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+                : '';
+            url = `${BACKEND_URL}/uploads/${req.file.filename}`;
+        }
+
         res.json({ url });
     });
 

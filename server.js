@@ -9,32 +9,42 @@ const setupRoutes = require('./src/routes');
 const setupSocket = require('./src/socket');
 
 // --- Configure Multer (Uploads) ---
-const uploadDir = path.join(__dirname, 'public', 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    const safeName = file.originalname.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-    cb(null, Date.now() + '-' + safeName);
+let upload;
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  // Production: Use Cloudinary
+  const { storage } = require('./src/cloudinary');
+  upload = multer({ storage: storage });
+  log.info('☁️ Storage: Cloudinary');
+} else {
+  // Development: Use Disk Storage
+  const uploadDir = path.join(__dirname, 'public', 'uploads');
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
   }
-});
 
-const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Apenas imagens são permitidas'), false);
+  const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+      const safeName = file.originalname.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+      cb(null, Date.now() + '-' + safeName);
     }
-  }
-});
+  });
+
+  upload = multer({
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+    fileFilter: (req, file, cb) => {
+      if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+      } else {
+        cb(new Error('Apenas imagens são permitidas'), false);
+      }
+    }
+  });
+  log.info('💾 Storage: Local Disk');
+}
 
 // --- Setup Server ---
 const app = express();
