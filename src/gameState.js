@@ -3,9 +3,11 @@ const path = require('path');
 const { log } = require('./utils');
 
 const questionsPath = path.join(__dirname, '../data/questions.json');
+const settingsPath = path.join(__dirname, '../data/settings.json');
 
 const state = {
     questions: [],
+    settings: { theme: 'default' },
     game: {
         pin: generatePin(),
         phase: 'waiting', // waiting | question | results | podium
@@ -36,6 +38,23 @@ function loadQuestions() {
 
 // Initial load
 loadQuestions();
+loadSettings();
+
+function loadSettings() {
+    try {
+        if (fs.existsSync(settingsPath)) {
+            state.settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+            log.info(`Configurações carregadas: ${JSON.stringify(state.settings)}`);
+        } else {
+            state.settings = { theme: 'default' };
+            log.warn('Arquivo de configurações não encontrado. Usando padrão.');
+        }
+    } catch (e) {
+        log.error('Erro ao carregar configurações:', e);
+        state.settings = { theme: 'default' };
+    }
+    return state.settings;
+}
 
 function generatePin() {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -59,5 +78,8 @@ module.exports = {
     generatePin,
     getPlayerList,
     getRanking,
-    questionsPath
+    getRanking,
+    questionsPath,
+    settingsPath,
+    loadSettings
 };

@@ -649,5 +649,125 @@ modalPreview.addEventListener('click', (e) => {
 });
 
 
+// --- SETTINGS LOGIC ---
+const btnSettings = document.getElementById('btn-settings');
+const modalSettings = document.getElementById('settings-modal');
+const btnCloseSettings = document.getElementById('btn-close-settings');
+const btnSaveSettings = document.getElementById('btn-save-settings');
+const themeRadios = document.querySelectorAll('input[name="theme"]');
+
+btnSettings.addEventListener('click', async () => {
+    // Fetch current settings
+    try {
+        const res = await fetch(API_URL + '/api/settings');
+        const settings = await res.json();
+
+        // Update UI
+        themeRadios.forEach(radio => {
+            radio.checked = (radio.value === settings.theme);
+        });
+
+        modalSettings.style.display = 'flex';
+    } catch (e) {
+        console.error('Erro ao carregar settings', e);
+        alert('Erro ao carregar configurações');
+    }
+});
+
+btnCloseSettings.addEventListener('click', () => {
+    modalSettings.style.display = 'none';
+});
+
+btnSaveSettings.addEventListener('click', async () => {
+    const selectedTheme = document.querySelector('input[name="theme"]:checked').value;
+
+    try {
+        const res = await fetch(API_URL + '/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ theme: selectedTheme })
+        });
+
+        if (res.ok) {
+            modalSettings.style.display = 'none';
+            // Optional: Feedback?
+        } else {
+            alert('Erro ao salvar configurações');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Erro de conexão');
+    }
+});
+
+modalSettings.addEventListener('click', (e) => {
+    if (e.target === modalSettings) modalSettings.style.display = 'none';
+});
+
+
 // Start
 init();
+
+// --- SETTINGS LOGIC ---
+const btnSettings = document.getElementById('btn-settings');
+const modalSettings = document.getElementById('settings-modal');
+const btnCloseSettings = document.getElementById('btn-close-settings');
+const btnSaveSettings = document.getElementById('btn-save-settings');
+const themeRadios = document.querySelectorAll('input[name="theme"]');
+
+if (btnSettings) {
+    btnSettings.addEventListener('click', async () => {
+        // Fetch current settings
+        try {
+            const res = await fetch(API_URL + '/api/settings');
+            const settings = await res.json();
+
+            // Update UI
+            themeRadios.forEach(radio => {
+                radio.checked = (radio.value === settings.theme);
+            });
+
+            modalSettings.style.display = 'flex';
+        } catch (e) {
+            console.error('Erro ao carregar settings', e);
+            alert('Erro ao carregar configurações');
+        }
+    });
+}
+
+if (btnCloseSettings) {
+    btnCloseSettings.addEventListener('click', () => {
+        modalSettings.style.display = 'none';
+    });
+}
+
+if (btnSaveSettings) {
+    btnSaveSettings.addEventListener('click', async () => {
+        const selectedRadio = document.querySelector('input[name="theme"]:checked');
+        if (!selectedRadio) return;
+        const selectedTheme = selectedRadio.value;
+
+        try {
+            const res = await fetch(API_URL + '/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ theme: selectedTheme })
+            });
+
+            if (res.ok) {
+                modalSettings.style.display = 'none';
+            } else {
+                alert('Erro ao salvar configurações');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro de conexão');
+        }
+    });
+}
+
+if (modalSettings) {
+    modalSettings.addEventListener('click', (e) => {
+        if (e.target === modalSettings) modalSettings.style.display = 'none';
+    });
+}

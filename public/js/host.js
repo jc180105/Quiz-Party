@@ -109,6 +109,13 @@ socket.on('game-pin', (data) => {
     loadQRCode();
 });
 
+socket.on('game-settings', (settings) => {
+    document.body.className = ''; // Reset
+    if (settings && settings.theme) {
+        document.body.classList.add('theme-' + settings.theme);
+    }
+});
+
 socket.on('player-list', (players) => {
     playerCount.textContent = players.length;
     playersGrid.innerHTML = '';

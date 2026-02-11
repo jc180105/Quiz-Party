@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const QRCode = require('qrcode');
-const { state, loadQuestions, questionsPath } = require('./gameState');
+const { state, loadQuestions, questionsPath, settingsPath, loadSettings } = require('./gameState');
 const { log, getLocalIp } = require('./utils');
 
 function setupRoutes(app, upload, io, PORT) {
@@ -12,6 +12,35 @@ function setupRoutes(app, upload, io, PORT) {
     // Get Questions
     app.get('/api/questions', (req, res) => {
         res.json(state.questions);
+    });
+
+    // Get Settings
+    app.get('/api/settings', (req, res) => {
+        res.json(state.settings);
+    });
+
+    // Update Settings
+    app.post('/api/settings', (req, res) => {
+        const newSettings = req.body;
+        if (!newSettings || !newSettings.theme) {
+            return res.status(400).json({ error: 'Formato inválido' });
+        }
+
+        fs.writeFile(settingsPath, JSON.stringify(newSettings, null, 2), (err) => {
+            if (err) {
+                log.error('Erro ao salvar configurações:', err);
+                return res.status(500).json({ error: 'Erro ao salvar arquivo' });
+            }
+            log.info(`Configurações atualizadas: ${newSettings.theme}`);
+
+            // Reload state
+            loadSettings();
+
+            // Emit to everyone
+            io.emit('game-settings', state.settings);
+
+            res.json({ success: true });
+        });
     });
 
     // Save Questions

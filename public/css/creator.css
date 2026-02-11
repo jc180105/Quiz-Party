@@ -1,3 +1,91 @@
+/* === SETTINGS MODAL CSS === */
+.settings-content {
+    width: 90%;
+    max-width: 500px;
+    background: #2d1155; /* Match Host Theme Dark Purple */
+    color: white;
+    border-radius: 16px;
+    padding: 30px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.setting-section {
+    margin: 20px 0;
+}
+
+.theme-options {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.theme-option {
+    flex: 1;
+    cursor: pointer;
+    position: relative;
+}
+
+.theme-option input {
+    display: none;
+}
+
+.theme-preview {
+    height: 100px;
+    border-radius: 8px;
+    border: 3px solid transparent;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.theme-default {
+    background: linear-gradient(135deg, #1f005c, #ca485c);
+}
+
+.theme-disco {
+    background: linear-gradient(135deg, #000, #333);
+    /* Simulate disco ball via CSS gradient or image if available later */
+    background-image: url('/img/disco-ball.png'), linear-gradient(135deg, #1f005c, #ca485c);
+    background-blend-mode: overlay;
+    background-size: cover;
+}
+
+.theme-option input:checked + .theme-preview {
+    border-color: #ffd700; /* Gold */
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.theme-option input:checked + .theme-preview::after {
+    content: '✓';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ffd700;
+    color: #000;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
 :root {
     --header-h: 60px;
     --sidebar-w: 200px;

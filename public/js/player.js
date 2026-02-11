@@ -150,6 +150,13 @@ socket.on('join-error', (data) => {
     joinError.textContent = data.message;
 });
 
+socket.on('game-settings', (settings) => {
+    document.body.className = ''; // Reset
+    if (settings && settings.theme) {
+        document.body.classList.add('theme-' + settings.theme);
+    }
+});
+
 socket.on('show-options', (data) => {
     showScreen('answer');
     hasAnswered = false;

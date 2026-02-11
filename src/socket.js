@@ -104,6 +104,7 @@ function setupSocket(io) {
 
             // Notify Host
             socket.emit('game-pin', { pin: gameState.pin });
+            socket.emit('game-settings', state.settings); // Send settings
             socket.emit('player-list', []);
 
             // Notify Players (Force Reset)
@@ -132,6 +133,7 @@ function setupSocket(io) {
             });
 
             socket.join('players-room');
+            socket.emit('game-settings', state.settings); // Send settings
             socket.emit('join-success', { name: data.name, avatar: data.avatar });
             io.to('host-room').emit('player-list', getPlayerList());
             log.info(`Jogador "${data.name}" entrou. Avatar: ${!!data.avatar}`);
