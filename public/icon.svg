@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6c5ce7"/>
+      <stop offset="100%" style="stop-color:#e056a0"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="url(#bg)"/>
+  <!-- Confetti -->
+  <circle cx="80" cy="100" r="12" fill="#ffd700" opacity="0.8"/>
+  <circle cx="420" cy="80" r="10" fill="#00d2d3" opacity="0.8"/>
+  <circle cx="450" cy="400" r="14" fill="#ff6b6b" opacity="0.7"/>
+  <circle cx="70" cy="380" r="11" fill="#48dbfb" opacity="0.7"/>
+  <circle cx="150" cy="60" r="8" fill="#ff9ff3" opacity="0.8"/>
+  <circle cx="390" cy="450" r="9" fill="#feca57" opacity="0.8"/>
+  <rect x="340" y="50" width="20" height="8" rx="4" fill="#ff6b6b" transform="rotate(30 350 54)" opacity="0.7"/>
+  <rect x="100" y="430" width="18" height="7" rx="3" fill="#ffd700" transform="rotate(-20 109 433)" opacity="0.7"/>
+  <!-- Party Hat -->
+  <polygon points="256,80 220,175 292,175" fill="#feca57"/>
+  <polygon points="256,80 235,140 277,140" fill="#ff6b6b"/>
+  <circle cx="256" cy="75" r="12" fill="#ff9ff3"/>
+  <ellipse cx="256" cy="178" rx="40" ry="10" fill="#feca57" opacity="0.6"/>
+  <!-- Question Mark -->
+  <text x="256" y="390" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="280" font-weight="900" fill="white" opacity="0.95">?</text>
+  <!-- Star sparkles -->
+  <polygon points="420,200 425,215 440,215 428,225 432,240 420,232 408,240 412,225 400,215 415,215" fill="#ffd700" opacity="0.9"/>
+  <polygon points="100,250 103,260 113,260 105,266 108,276 100,270 92,276 95,266 87,260 97,260" fill="#fff" opacity="0.6"/>
+</svg>
