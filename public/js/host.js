@@ -1,5 +1,5 @@
 // === HOST JavaScript ===
-const socket = io();
+const socket = io(API_URL || undefined);
 
 // DOM Elements
 const screens = {
@@ -91,7 +91,7 @@ let currentMaxTime = 20;
 socket.emit('host-join');
 
 // Load QR Code
-fetch('/api/qrcode')
+fetch(API_URL + '/api/qrcode')
     .then(r => r.json())
     .then(data => {
         qrCode.src = data.qr;
@@ -274,7 +274,7 @@ socket.on('show-podium', (data) => {
 
 socket.on('game-reset', () => {
     showScreen('waiting');
-    fetch('/api/qrcode')
+    fetch(API_URL + '/api/qrcode')
         .then(r => r.json())
         .then(data => {
             qrCode.src = data.qr;

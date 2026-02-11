@@ -37,7 +37,7 @@ const selectType = document.getElementById('select-type');
 // --- INIT ---
 async function init() {
     try {
-        const res = await fetch('/api/questions');
+        const res = await fetch(API_URL + '/api/questions');
         questions = await res.json();
         if (questions.length === 0) addNewSlide();
         renderSidebar();
@@ -364,7 +364,7 @@ document.getElementById('file-upload').addEventListener('change', async (e) => {
     formData.append('image', file);
 
     try {
-        const res = await fetch('/api/upload', {
+        const res = await fetch(API_URL + '/api/upload', {
             method: 'POST',
             body: formData
         });
@@ -481,7 +481,7 @@ btnSave.addEventListener('click', async () => {
     saveCurrentState();
     btnSave.textContent = "Saving...";
     try {
-        const res = await fetch('/api/questions', {
+        const res = await fetch(API_URL + '/api/questions', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(questions)

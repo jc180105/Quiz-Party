@@ -154,8 +154,9 @@
         </a>
     </div>
 
+    <script src="/js/config.js"></script>
     <script>
-        fetch('/api/questions')
+        fetch(API_URL + '/api/questions')
             .then(r => r.json())
             .then(data => {
                 const el = document.getElementById('question-count');

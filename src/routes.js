@@ -57,9 +57,16 @@ function setupRoutes(app, upload, io, PORT) {
     // QR Code
     app.get('/api/qrcode', async (req, res) => {
         try {
-            const protocol = req.protocol;
-            // Use local IP instead of host header to ensure mobile access works
-            const url = `${protocol}://${LOCAL_IP}:${PORT}/player?pin=${state.game.pin}`;
+            const FRONTEND_URL = process.env.FRONTEND_URL || '';
+            let url;
+            if (FRONTEND_URL) {
+                // Production: QR points to Vercel frontend
+                url = `${FRONTEND_URL}/player?pin=${state.game.pin}`;
+            } else {
+                // Dev: QR points to local IP
+                const protocol = req.protocol;
+                url = `${protocol}://${LOCAL_IP}:${PORT}/player?pin=${state.game.pin}`;
+            }
             const qr = await QRCode.toDataURL(url, { width: 300, margin: 2 });
             res.json({ qr, pin: state.game.pin, url });
         } catch (err) {
@@ -72,7 +79,11 @@ function setupRoutes(app, upload, io, PORT) {
         if (!req.file) {
             return res.status(400).json({ error: 'Nenhum arquivo enviado' });
         }
-        const url = `/uploads/${req.file.filename}`;
+        // Return full URL so frontend (Vercel) can display images from backend (Railway)
+        const BACKEND_URL = process.env.RAILWAY_PUBLIC_DOMAIN
+            ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
+            : '';
+        const url = `${BACKEND_URL}/uploads/${req.file.filename}`;
         res.json({ url });
     });
 

@@ -40,15 +40,33 @@ const upload = multer({
 const app = express();
 const server = http.createServer(app);
 const LOCAL_IP = getLocalIp();
+const FRONTEND_URL = process.env.FRONTEND_URL || '';
+
+// CORS Origins (Dev + Prod)
+const allowedOrigins = [
+  `http://localhost:3000`,
+  `http://${LOCAL_IP}:3000`,
+];
+if (FRONTEND_URL) allowedOrigins.push(FRONTEND_URL);
 
 const io = new Server(server, {
   cors: {
-    origin: [`http://localhost:3000`, `http://${LOCAL_IP}:3000`],
+    origin: allowedOrigins,
     methods: ['GET', 'POST']
   }
 });
 
 // Middlewares
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json({ limit: '1mb' }));
 

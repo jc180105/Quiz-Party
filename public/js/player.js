@@ -1,5 +1,5 @@
 // === PLAYER JavaScript ===
-const socket = io({
+const socket = io(API_URL || undefined, {
     reconnection: true,
     reconnectionAttempts: 10,
     reconnectionDelay: 1000,
@@ -59,7 +59,7 @@ if (avatarPreview && avatarInput) {
         formData.append('image', file);
 
         try {
-            const res = await fetch('/api/upload', { method: 'POST', body: formData });
+            const res = await fetch(API_URL + '/api/upload', { method: 'POST', body: formData });
             if (res.ok) {
                 const data = await res.json();
                 avatarUrl = data.url;
