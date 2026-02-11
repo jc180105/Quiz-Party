@@ -1,5 +1,5 @@
 {
-  "name": "quiz-aniversario-ana-julia",
+  "name": "quiz-party",
   "version": "1.0.0",
   "description": "Quiz interativo estilo Kahoot para 50+ jogadores",
   "main": "server.js",
