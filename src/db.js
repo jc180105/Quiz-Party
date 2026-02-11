@@ -1,6 +1,12 @@
 const { Pool } = require('pg');
 const { log } = require('./utils');
 
+if (!process.env.DATABASE_URL) {
+    log.error('❌ DATABASE_URL não definida! O servidor não pode conectar ao banco de dados.');
+    log.error('👉 Verifique as variáveis de ambiente no Railway.');
+    process.exit(1);
+}
+
 const pool = new Pool({
     connectionString: process.env.DATABASE_URL,
     ssl: {
