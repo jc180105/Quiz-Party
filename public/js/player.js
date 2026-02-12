@@ -156,6 +156,7 @@ socket.on('game-settings', (settings) => {
     if (settings && settings.theme) {
         if (settings.theme.startsWith('custom:')) {
             const url = settings.theme.split('custom:')[1];
+            document.body.classList.add('theme-custom');
             document.body.style.backgroundImage = `url('${url}')`;
             document.body.style.backgroundSize = 'cover';
             document.body.style.backgroundPosition = 'center';

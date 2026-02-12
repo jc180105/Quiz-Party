@@ -51,6 +51,26 @@ body {
   }
 }
 
+/* === THEME CUSTOM (User Upload) === */
+body.theme-custom {
+  background-color: #b0b0b0;
+  /* Silver fallback */
+  animation: none;
+  /* Stop color cycle */
+}
+
+/* Remove dark gradients from containers when custom theme is active */
+body.theme-custom .question-container,
+body.theme-custom .results-container,
+body.theme-custom .podium-container {
+  background: rgba(255, 255, 255, 0.1);
+  /* "Silver" glass effect */
+  backdrop-filter: blur(5px);
+  /* Enhance readability */
+}
+
+/* Ensure text contrast if image is bright (optional, but sticking to white text for now) */
+
 /* === THEMES === */
 /* Default is already the body gradient */
 
