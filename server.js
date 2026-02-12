@@ -12,43 +12,21 @@ const { initDB } = require('./src/db');
 
 // --- Configure Multer (Uploads) ---
 let upload;
-log.info('☁️ Configurando Upload...');
-log.info(`ENV CLOUD_NAME: ${process.env.CLOUDINARY_CLOUD_NAME ? 'DEFINIDO' : 'NÃO DEFINIDO'}`);
 
-if (process.env.CLOUDINARY_CLOUD_NAME) {
-  // Production: Use Cloudinary
-  try {
-    const { storage } = require('./src/cloudinary');
-    upload = multer({ storage: storage });
-    log.info('✅ Storage: Cloudinary ATIVADO');
-  } catch (e) {
-    log.error('❌ Erro ao configurar Cloudinary:', e);
-    // Fallback to disk? Better to fail hard to debug.
-    process.exit(1);
-  }
-} else {
-  // Development: Use Disk Storage
-  log.warn('⚠️ Storage: Cloudinary NÃO detectado. Usando disco local (efêmero).');
-  const uploadDir = path.join(__dirname, 'public', 'uploads');
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-  }
+// Use Memory Storage for DB persistence
+const storage = multer.memoryStorage();
 
-  // Use Memory Storage for DB persistence
-  const storage = multer.memoryStorage();
-
-  upload = multer({
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
-    fileFilter: (req, file, cb) => {
-      if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-      } else {
-        cb(new Error('Apenas imagens são permitidas'), false);
-      }
+upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Apenas imagens são permitidas'), false);
     }
-  });
-}
+  }
+});
 
 // --- Setup Server ---
 const app = express();
