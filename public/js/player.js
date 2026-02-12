@@ -141,13 +141,40 @@ function joinGame() {
 }
 
 // --- Socket Events ---
+socket.on('connect', () => {
+    // Auto-reconnect if session exists
+    const session = localStorage.getItem('quiz-session');
+    if (session) {
+        const data = JSON.parse(session);
+        console.log('Tentando reconexão automática...', data);
+        socket.emit('player-join', data);
+    }
+});
+
 socket.on('join-success', (data) => {
+    // Save session (handle rejoin where inputPin might be empty)
+    let pin = inputPin.value;
+    if (!pin) {
+        try {
+            const stored = JSON.parse(localStorage.getItem('quiz-session'));
+            if (stored && stored.pin) pin = stored.pin;
+        } catch (e) { }
+    }
+
+    localStorage.setItem('quiz-session', JSON.stringify({
+        pin: pin,
+        name: data.name,
+        avatar: data.avatar
+    }));
+
     lobbyName.textContent = data.name;
     showScreen('lobby');
 });
 
 socket.on('join-error', (data) => {
     joinError.textContent = data.message;
+    // If auto-join failed (e.g. wrong PIN), maybe we shouldn't clear automatically
+    // but if it was a manual attempt, let them try again.
 });
 
 socket.on('game-settings', (settings) => {
@@ -264,9 +291,13 @@ socket.on('show-final-rank', (data) => {
     } else {
         finalMessage.textContent = '🎮 Obrigado por jogar!';
     }
+
+    // Clear session on game over/final rank? 
+    // Maybe not, usually players play multiple games.
 });
 
 socket.on('game-reset', () => {
+    localStorage.removeItem('quiz-session'); // Clear session
     showScreen('lobby');
 });
 

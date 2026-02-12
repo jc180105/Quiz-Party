@@ -115,6 +115,72 @@ function setupSocket(io) {
 
         // Player joins
         socket.on('player-join', (data) => {
+            // 1. Check if player name exists (Reconnection Logic)
+            let existingSocketId = null;
+            for (const [id, p] of gameState.players.entries()) {
+                if (p.name === data.name) {
+                    existingSocketId = id;
+                    break;
+                }
+            }
+
+            if (existingSocketId) {
+                // --- RECONNECTION ---
+                const playerData = gameState.players.get(existingSocketId);
+
+                // Migrate Player Data
+                gameState.players.delete(existingSocketId);
+                gameState.players.set(socket.id, playerData);
+
+                // Migrate Answer Data (if any)
+                if (gameState.answers.has(existingSocketId)) {
+                    const ans = gameState.answers.get(existingSocketId);
+                    gameState.answers.delete(existingSocketId);
+                    gameState.answers.set(socket.id, ans);
+                }
+
+                socket.join('players-room');
+                socket.emit('join-success', { name: playerData.name, avatar: playerData.avatar });
+                socket.emit('game-settings', state.settings);
+
+                log.info(`Jogador "${data.name}" RECONECTOU (ID: ${socket.id})`);
+
+                // --- SYNC STATE IMMEDIATELY ---
+                const questions = state.questions;
+                if (gameState.phase === 'question' && gameState.currentQuestion >= 0) {
+                    const q = questions[gameState.currentQuestion];
+                    socket.emit('show-options', {
+                        index: gameState.currentQuestion,
+                        total: questions.length,
+                        question: q.question,
+                        options: q.options,
+                        time: q.time || 20
+                    });
+                } else if (gameState.phase === 'results') {
+                    // We need to reconstruct the results payload slightly
+                    const q = questions[gameState.currentQuestion];
+                    const ranking = getRanking();
+
+                    // Helper: calculate answer counts
+                    const answerCounts = [0, 0, 0, 0];
+                    gameState.answers.forEach((a) => {
+                        if (a.answer >= 0 && a.answer < 4) answerCounts[a.answer]++;
+                    });
+
+                    socket.emit('answer-result', {
+                        correct: gameState.answers.get(socket.id)?.correct || false,
+                        points: gameState.answers.get(socket.id)?.points || 0,
+                        streak: playerData.streak
+                    });
+                } else if (gameState.phase === 'podium') {
+                    const ranking = getRanking();
+                    socket.emit('show-final-rank', { ranking });
+                }
+
+                return;
+            }
+
+            // 2. Normal Join Logic
             if (data.pin !== gameState.pin) {
                 socket.emit('join-error', { message: 'PIN inválido!' });
                 return;
