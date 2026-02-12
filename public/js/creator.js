@@ -788,6 +788,10 @@ if (btnSaveSettings) {
     });
 }
 
+
+// DEBUG: Check if script loaded
+console.log('Creator script loaded successfully');
+
 init();
 
 
