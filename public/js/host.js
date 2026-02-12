@@ -111,8 +111,17 @@ socket.on('game-pin', (data) => {
 
 socket.on('game-settings', (settings) => {
     document.body.className = ''; // Reset
+    document.body.style.backgroundImage = ''; // Reset custom
     if (settings && settings.theme) {
-        document.body.classList.add('theme-' + settings.theme);
+        if (settings.theme.startsWith('custom:')) {
+            const url = settings.theme.split('custom:')[1];
+            document.body.style.backgroundImage = `url('${url}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+            document.body.style.backgroundAttachment = 'fixed'; // Optional: Parallax-like
+        } else {
+            document.body.classList.add('theme-' + settings.theme);
+        }
     }
 });
 

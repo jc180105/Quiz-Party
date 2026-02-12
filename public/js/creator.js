@@ -762,7 +762,36 @@ if (settingsModal) {
 if (btnSaveSettings) {
     btnSaveSettings.addEventListener('click', async () => {
         const selectedOption = document.querySelector('input[name="theme"]:checked');
-        const selectedTheme = selectedOption ? selectedOption.value : 'default';
+        let selectedTheme = selectedOption ? selectedOption.value : 'default';
+
+        // Check if custom bg is uploaded
+        const fileInput = document.getElementById('bg-upload');
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('image', file);
+
+            btnSaveSettings.textContent = "Uploading...";
+            try {
+                const uploadRes = await fetch(API_URL + '/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                if (uploadRes.ok) {
+                    const data = await uploadRes.json();
+                    selectedTheme = `custom:${data.url}`;
+                } else {
+                    alert('Erro ao enviar imagem de fundo');
+                    btnSaveSettings.textContent = "Salvar";
+                    return;
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Erro de conexão no upload');
+                btnSaveSettings.textContent = "Salvar";
+                return;
+            }
+        }
 
         btnSaveSettings.textContent = "Salvando...";
 
@@ -774,7 +803,6 @@ if (btnSaveSettings) {
             });
 
             if (res.ok) {
-                // alert('Configurações salvas! 💾'); // Removed for smoother XP
                 settingsModal.style.display = 'none';
             } else {
                 alert('Erro ao salvar settings.');
@@ -788,11 +816,25 @@ if (btnSaveSettings) {
     });
 }
 
+// Display filename on select
+const bgUploadInput = document.getElementById('bg-upload');
+if (bgUploadInput) {
+    bgUploadInput.addEventListener('change', (e) => {
+        const fileName = e.target.files[0] ? e.target.files[0].name : '';
+        document.getElementById('bg-filename').textContent = fileName;
+        // Uncheck other themes if file is selected
+        if (fileName) {
+            themeRadios.forEach(r => r.checked = false);
+        }
+    });
+}
+
 
 // DEBUG: Check if script loaded
 console.log('Creator script loaded successfully');
 
-init();
+// Old init removed to prevent double call
+// init();
 
 
 
