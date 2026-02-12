@@ -711,6 +711,83 @@ modalPreview.addEventListener('click', (e) => {
     if (e.target === modalPreview) modalPreview.style.display = 'none';
 });
 
+
+// --- SETTINGS MODAL LOGIC ---
+const btnSettings = document.getElementById('btn-settings');
+const btnCloseSettings = document.getElementById('btn-close-settings');
+const btnSaveSettings = document.getElementById('btn-save-settings');
+const themeRadios = document.getElementsByName('theme');
+const settingsModal = document.getElementById('settings-modal');
+
+// Open Settings
+if (btnSettings) {
+    btnSettings.addEventListener('click', async () => {
+        // Fetch current settings
+        try {
+            const res = await fetch(API_URL + '/api/settings');
+            if (res.ok) {
+                const settings = await res.json();
+                // Set theme radio
+                if (settings.theme) {
+                    for (const radio of themeRadios) {
+                        if (radio.value === settings.theme) {
+                            radio.checked = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        if (settingsModal) settingsModal.style.display = 'flex';
+    });
+}
+
+// Close Settings
+if (btnCloseSettings) {
+    btnCloseSettings.addEventListener('click', () => {
+        if (settingsModal) settingsModal.style.display = 'none';
+    });
+}
+
+// Close on outside click
+if (settingsModal) {
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) settingsModal.style.display = 'none';
+    });
+}
+
+// Save Settings
+if (btnSaveSettings) {
+    btnSaveSettings.addEventListener('click', async () => {
+        const selectedOption = document.querySelector('input[name="theme"]:checked');
+        const selectedTheme = selectedOption ? selectedOption.value : 'default';
+
+        btnSaveSettings.textContent = "Salvando...";
+
+        try {
+            const res = await fetch(API_URL + '/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ theme: selectedTheme })
+            });
+
+            if (res.ok) {
+                // alert('Configurações salvas! 💾'); // Removed for smoother XP
+                settingsModal.style.display = 'none';
+            } else {
+                alert('Erro ao salvar settings.');
+            }
+        } catch (e) {
+            console.error(e);
+            alert('Erro de conexão.');
+        } finally {
+            btnSaveSettings.textContent = "Salvar";
+        }
+    });
+}
+
 init();
 
 

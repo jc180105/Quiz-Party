@@ -2,13 +2,14 @@
 .settings-content {
     width: 90%;
     max-width: 500px;
-    background: #2d1155; /* Match Host Theme Dark Purple */
+    background: #2d1155;
+    /* Match Host Theme Dark Purple */
     color: white;
     border-radius: 16px;
     padding: 30px;
     position: relative;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
 .setting-section {
@@ -53,18 +54,19 @@
 .theme-disco {
     background: linear-gradient(135deg, #000, #333);
     /* Simulate disco ball via CSS gradient or image if available later */
-    background-image: url('/img/disco-ball.png'), linear-gradient(135deg, #1f005c, #ca485c);
+    background-image: url('/img/disco-ball.jpg'), linear-gradient(135deg, #1f005c, #ca485c);
     background-blend-mode: overlay;
     background-size: cover;
 }
 
-.theme-option input:checked + .theme-preview {
-    border-color: #ffd700; /* Gold */
+.theme-option input:checked+.theme-preview {
+    border-color: #ffd700;
+    /* Gold */
     transform: scale(1.05);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.theme-option input:checked + .theme-preview::after {
+.theme-option input:checked+.theme-preview::after {
     content: '✓';
     position: absolute;
     top: 5px;
