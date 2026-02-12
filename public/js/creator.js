@@ -722,6 +722,7 @@ const settingsModal = document.getElementById('settings-modal');
 // Open Settings
 if (btnSettings) {
     btnSettings.addEventListener('click', async () => {
+        console.log('Botão de configurações clicado!');
         // Fetch current settings
         try {
             const res = await fetch(API_URL + '/api/settings');
@@ -833,8 +834,8 @@ if (bgUploadInput) {
 // DEBUG: Check if script loaded
 console.log('Creator script loaded successfully');
 
-// Old init removed to prevent double call
-// init();
+// Initialize App
+init();
 
 
 
