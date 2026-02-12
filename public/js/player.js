@@ -113,6 +113,26 @@ if (urlParams.has('pin')) {
     inputName.focus();
 }
 
+// --- UUID Helper ---
+function generateUUID() { // Public Domain/MIT
+    let d = new Date().getTime();
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        d += performance.now(); // use high-precision timer if available
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        let r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
+}
+
+// Get or Create Player ID
+let playerId = localStorage.getItem('player-uuid');
+if (!playerId) {
+    playerId = generateUUID();
+    localStorage.setItem('player-uuid', playerId);
+}
+
 // --- Join Game ---
 btnJoin.addEventListener('click', joinGame);
 inputName.addEventListener('keydown', (e) => {
@@ -137,7 +157,20 @@ function joinGame() {
 
     joinError.textContent = '';
     playerName = name;
-    socket.emit('player-join', { pin, name, avatar: avatarUrl });
+
+    // Save session immediately (optimistic)
+    localStorage.setItem('quiz-session', JSON.stringify({
+        pin: pin,
+        name: name,
+        avatar: avatarUrl
+    }));
+
+    socket.emit('player-join', {
+        pin,
+        name,
+        avatar: avatarUrl,
+        playerId: playerId // Send persistent ID
+    });
 }
 
 // --- Socket Events ---
@@ -145,9 +178,17 @@ socket.on('connect', () => {
     // Auto-reconnect if session exists
     const session = localStorage.getItem('quiz-session');
     if (session) {
-        const data = JSON.parse(session);
-        console.log('Tentando reconexão automática...', data);
-        socket.emit('player-join', data);
+        try {
+            const data = JSON.parse(session);
+            console.log('Tentando reconexão automática...', data);
+            // Re-send join with existing ID and stored data
+            socket.emit('player-join', {
+                pin: data.pin,
+                name: data.name,
+                avatar: data.avatar,
+                playerId: playerId
+            });
+        } catch (e) { console.error(e); }
     }
 });
 

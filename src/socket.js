@@ -115,10 +115,17 @@ function setupSocket(io) {
 
         // Player joins
         socket.on('player-join', (data) => {
-            // 1. Check if player name exists (Reconnection Logic)
+            // 1. Check if player exists by UUID (Robust Reconnection)
             let existingSocketId = null;
+
+            // Check by playerId first (Best)
             for (const [id, p] of gameState.players.entries()) {
-                if (p.name === data.name) {
+                if (data.playerId && p.playerId === data.playerId) {
+                    existingSocketId = id;
+                    break;
+                }
+                // Fallback: Check by name if no ID yet (Legacy/First time)
+                if (!existingSocketId && p.name === data.name) {
                     existingSocketId = id;
                     break;
                 }
@@ -130,6 +137,9 @@ function setupSocket(io) {
 
                 // Migrate Player Data
                 gameState.players.delete(existingSocketId);
+
+                // Update socket ID but keep stats
+                playerData.playerId = data.playerId || playerData.playerId;
                 gameState.players.set(socket.id, playerData);
 
                 // Migrate Answer Data (if any)
@@ -195,7 +205,8 @@ function setupSocket(io) {
                 avatar: data.avatar || null,
                 score: 0,
                 streak: 0,
-                answers: []
+                answers: [],
+                playerId: data.playerId
             });
 
             socket.join('players-room');
@@ -261,10 +272,16 @@ function setupSocket(io) {
         // Disconnect
         socket.on('disconnect', () => {
             if (gameState.players.has(socket.id)) {
-                const name = gameState.players.get(socket.id).name;
-                gameState.players.delete(socket.id);
-                io.to('host-room').emit('player-list', getPlayerList());
-                log.info(`Jogador "${name}" saiu. Total: ${gameState.players.size}`);
+                // ONLY remove player if game hasn't started yet (Lobby)
+                // If game is running, keep them in memory for reconnection
+                if (gameState.phase === 'waiting') {
+                    const name = gameState.players.get(socket.id).name;
+                    gameState.players.delete(socket.id);
+                    io.to('host-room').emit('player-list', getPlayerList());
+                    log.info(`Jogador "${name}" saiu (Lobby).`);
+                } else {
+                    log.info(`Jogador desconectou durante o jogo (Mantendo estado). ID: ${socket.id}`);
+                }
             }
             if (socket.id === gameState.hostSocket) {
                 log.info('Host desconectou.');
